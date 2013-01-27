@@ -23,12 +23,30 @@ int run_loop(config_t cfg) {
     address.sin_port = htons(cfg->port);
     bind(sock, (struct sockaddr*)&address, sizeof(address));
     listen(sock, 5);
+    fd_set reads;
+    FD_ZERO(reads);
+    fd_set writes;
+    FD_ZERO(writes);
+    int highest = 0;
     while (1) {
         int new = accept(sock, (struct sockaddr*)&address, sizeof(address));
         if (new != -1) {
             player_t pl = calloc(sizeof(*pl), 1);
             pl->fd = new;
             pl->cid = next_id++;
+            list_append(players, pl);
+            FD_SET(new, reads);
+            FD_SET(new, writes);
+            if (new > highest) {
+                highest = new;
+            }
+        }
+        int a = select(highest + 1, &reads, &writes, NULL, NULL);
+        if (a != -1) {
+            // do shit here
+        } else {
+            log("%s", strerror(errno));
+            break;
         }
     }
     close(sock);

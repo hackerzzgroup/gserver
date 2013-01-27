@@ -9,6 +9,9 @@ typedef struct player_s {
     char *name;
     unsigned long pos_x;
     unsigned long pos_y;
+    unsigned int sprite_x;
+    unsigned int sprite_y;
+    unsigned int sprite_pixels[];
 } *player_t;
 
 int run_loop(config_t cfg);
